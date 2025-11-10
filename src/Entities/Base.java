@@ -9,12 +9,12 @@ package Entities;
  * @author lautaromarin
  */
 public class Base {
-    private int id;
+    private long id;
     private boolean eliminado;
    
   
     //constructor completo
-    public Base(int id, boolean eliminado){
+    public Base(long id, boolean eliminado){
         this.id = id;
         this.eliminado = eliminado;
     }
@@ -25,11 +25,11 @@ public class Base {
     }
     
     
-    public void setId(int id){
+    public void setId(long id){
         this.id = id;
     }
     
-    public int getId(){
+    public long getId(){
         return id;
     }
     

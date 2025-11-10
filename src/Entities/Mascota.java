@@ -3,14 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Entities;
+import java.time.LocalDate;
 
 /**
  *
  * @author lautaromarin
  */
 public class Mascota extends Base {
-    private String nombre, especie, raza, fechaNacimiento, duenio, telefonoDuenio;
+    private String nombre, especie, raza, duenio, telefonoDuenio;
     private Microchip microchip;
+    private LocalDate fechaNacimiento;
     
     //constructor vacio
     public Mascota(){
@@ -19,7 +21,7 @@ public class Mascota extends Base {
     
     
    //constructor completo
-    public Mascota(int id, String nombre, String especie, String raza, String fechaNacimiento, String duenio, String telefonoDuenio, Microchip microchip){
+    public Mascota(long id, String nombre, String especie, String raza, LocalDate fechaNacimiento, String duenio, String telefonoDuenio, Microchip microchip){
         super(id, false);
         this.nombre = nombre;
         this.especie = especie;
@@ -57,11 +59,11 @@ public class Mascota extends Base {
         this.raza = raza;
     }
 
-    public String getFechaNacimiento() {
+    public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(String fechaNacimiento) {
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 

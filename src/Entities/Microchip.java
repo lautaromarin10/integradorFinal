@@ -4,12 +4,15 @@
  */
 package Entities;
 
+import java.time.LocalDate;
+
 /**
  *
  * @author lautaromarin
  */
 public class Microchip extends Base {
-    private String codigo, fechaImplantacion, veterinaria, observaciones;
+    private String codigo, veterinaria, observaciones;
+    private LocalDate fechaImplantacion;
     
     //constructor vacio
     public Microchip(){
@@ -17,7 +20,7 @@ public class Microchip extends Base {
     }
     
     //constructor completo
-    public Microchip(int id, String codigo, String fechaImplantacion, String veterinaria, String observaciones){
+    public Microchip(long id, String codigo, LocalDate fechaImplantacion, String veterinaria, String observaciones){
         super(id, false);
         this.codigo = codigo;
         this.fechaImplantacion = fechaImplantacion;
@@ -35,11 +38,11 @@ public class Microchip extends Base {
         this.codigo = codigo;
     }
 
-    public String getFechaImplantacion() {
+    public LocalDate getFechaImplantacion() {
         return fechaImplantacion;
     }
 
-    public void setFechaImplantacion(String fechaImplantacion) {
+    public void setFechaImplantacion(LocalDate fechaImplantacion) {
         this.fechaImplantacion = fechaImplantacion;
     }
 
