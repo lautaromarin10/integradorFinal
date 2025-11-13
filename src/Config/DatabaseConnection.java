@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class DatabaseConnection {
     
     //URL de conexion JDBC
-    private static String URL = System.getProperty("db.url", "jdbc:mysql://localhost:3306/dbtpI");
+    private static String URL = System.getProperty("db.url", "jdbc:mysql://localhost:3306/mascotaMicrochip");
     //Usuario
     private static String USER = System.getProperty("db.user", "root");
     //Password
