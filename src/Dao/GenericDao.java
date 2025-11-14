@@ -4,7 +4,7 @@
  */
 // dao/GenericDao.java
 
-package dao;
+package Dao;
 
 import java.sql.Connection;
 import java.util.List;

@@ -18,12 +18,13 @@ public class DatabaseConnection {
     //Usuario
     private static String USER = System.getProperty("db.user", "root");
     //Password
-    private static String PASSWORD = System.getProperty("db.password", "");
+    private static String PASSWORD = System.getProperty("db.password", "rootroot");
 
     //Conexión
     //Arroja SQLException en caso de que algo este mal.
     
-    public static Connection getConnection() throws SQLException{
+    public static Connection getConnection() throws Exception{
+        Class.forName("com.mysql.cj.jdbc.Driver");
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
     

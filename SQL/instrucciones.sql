@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS mascota (
   raza VARCHAR(60) NOT NULL,
   fechaNacimiento DATE NULL,
   duenio VARCHAR(120) NOT NULL,
+  telefonoDuenio VARCHAR(60),
   microchip INT NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY uq_microchip (microchip),

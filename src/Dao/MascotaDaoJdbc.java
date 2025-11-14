@@ -4,13 +4,12 @@
  */
 // dao/MascotaDaoJdbc.java
 
-package dao;
+package Dao;
 
 import Config.DatabaseConnection;
 import Entities.Mascota;
 import Entities.Microchip;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class MascotaDaoJdbc implements MascotaDao {
         // La tabla 'mascotas' no tiene la referencia directa a microchip en DB.
         // La referencia 1-1 se maneja con una FK en la tabla 'microchips'.
         // Aquí solo insertamos los campos de Mascota.
-        String sql = "INSERT INTO mascotas (nombre, especie, raza, fecha_nacimiento, duenio, telefono_duenio, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO mascota (nombre, especie, raza, fechaNacimiento, duenio, telefonoDuenio, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             ps.setString(1, mascota.getNombre());
@@ -73,7 +72,7 @@ public class MascotaDaoJdbc implements MascotaDao {
 
     @Override
     public Mascota leer(long id) throws Exception {
-        String sql = "SELECT * FROM mascotas WHERE id = ? AND eliminado = FALSE";
+        String sql = "SELECT * FROM mascota WHERE id = ? AND eliminado = FALSE";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -90,7 +89,7 @@ public class MascotaDaoJdbc implements MascotaDao {
     @Override
     public List<Mascota> leerTodos() throws Exception {
         List<Mascota> lista = new ArrayList<>();
-        String sql = "SELECT * FROM mascotas WHERE eliminado = FALSE";
+        String sql = "SELECT * FROM mascota WHERE eliminado = FALSE";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -106,7 +105,7 @@ public class MascotaDaoJdbc implements MascotaDao {
     @Override
     public List<Mascota> buscarPorDuenio(String duenio) throws Exception {
         List<Mascota> lista = new ArrayList<>();
-        String sql = "SELECT * FROM mascotas WHERE duenio LIKE ? AND eliminado = FALSE";
+        String sql = "SELECT * FROM mascota WHERE duenio LIKE ? AND eliminado = FALSE";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -130,11 +129,14 @@ public class MascotaDaoJdbc implements MascotaDao {
     // Ejemplo de actualización transaccional:
     @Override
     public void actualizar(Mascota mascota, Connection conn) throws Exception {
-        String sql = "UPDATE mascotas SET nombre = ?, especie = ?, raza = ?, fecha_nacimiento = ?, duenio = ?, telefono_duenio = ? WHERE id = ?";
+        String sql = "UPDATE mascota SET nombre = ?, especie = ?, raza = ?, fechaNacimiento = ?, duenio = ?, telefonoDuenio = ? WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, mascota.getNombre());
-            // ... setear todos los campos
+            ps.setString(2, mascota.getEspecie());
+            ps.setString(3, mascota.getRaza());
             ps.setDate(4, Date.valueOf(mascota.getFechaNacimiento()));
+            ps.setString(5, mascota.getDuenio());
+            ps.setString(6, mascota.getTelefonoDuenio());
             ps.setLong(7, mascota.getId());
             ps.executeUpdate();
         }
@@ -143,7 +145,7 @@ public class MascotaDaoJdbc implements MascotaDao {
     // Ejemplo de eliminación lógica transaccional:
     @Override
     public void eliminar(long id, Connection conn) throws Exception {
-        String sql = "UPDATE mascotas SET eliminado = TRUE WHERE id = ?";
+        String sql = "UPDATE mascota SET eliminado = 1 WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
             ps.executeUpdate();
@@ -162,13 +164,13 @@ public class MascotaDaoJdbc implements MascotaDao {
         m.setEspecie(rs.getString("especie"));
         m.setRaza(rs.getString("raza"));
         
-        Date sqlDate = rs.getDate("fecha_nacimiento");
+        Date sqlDate = rs.getDate("fechaNacimiento");
         if (sqlDate != null) {
             m.setFechaNacimiento(sqlDate.toLocalDate()); // Convertir Date a LocalDate
         }
         
         m.setDuenio(rs.getString("duenio"));
-        m.setTelefonoDuenio(rs.getString("telefono_duenio"));
+        m.setTelefonoDuenio(rs.getString("telefonoDuenio"));
         
         // RECUPERAR EL MICROCHIP ASOCIADO (LA REFERENCIA 1->1)
         Microchip microchip = microchipDao.leerPorIdMascota(m.getId()); 
@@ -178,12 +180,16 @@ public class MascotaDaoJdbc implements MascotaDao {
     }
 
     @Override
-    public void actualizar(Mascota entity) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void actualizar(Mascota mascota) throws Exception {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            actualizar(mascota, conn); // delega en la versión transaccional
+        }
     }
 
     @Override
     public void eliminar(long id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            eliminar(id, conn); // delega en la versión transaccional
+        }
+}
 }

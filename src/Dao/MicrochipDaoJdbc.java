@@ -4,7 +4,7 @@
  */
 // dao/MicrochipDaoJdbc.java
 
-package dao;
+package Dao;
 
 import Config.DatabaseConnection;
 import Entities.Microchip;
@@ -30,10 +30,9 @@ public class MicrochipDaoJdbc implements MicrochipDao {
     
     @Override
     public Microchip crear(Microchip microchip, Connection conn) throws Exception {
-        // NOTA: Asumimos que la FK 'id_mascota' se actualiza con un UPDATE separado 
         // o se incluye aquí si el Service ya tiene el ID de Mascota.
         // Para que la inserción simple funcione, la dejamos fuera por ahora.
-        String sql = "INSERT INTO microchips (codigo, fecha_implantacion, veterinaria, observaciones, eliminado) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO microchip (codigo, fechaImplantacion, veterinaria, observaciones, eliminado) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             ps.setString(1, microchip.getCodigo());
@@ -64,7 +63,7 @@ public class MicrochipDaoJdbc implements MicrochipDao {
     @Override
     public Microchip leerPorIdMascota(long idMascota) throws Exception {
         // ¡Crucial para la relación 1-1!
-        String sql = "SELECT * FROM microchips WHERE id_mascota = ? AND eliminado = FALSE";
+        String sql = "SELECT * FROM microchip JOIN mascota WHERE mascota.id = ? AND microchip.eliminado = FALSE";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -81,7 +80,7 @@ public class MicrochipDaoJdbc implements MicrochipDao {
     // Implementación de la búsqueda específica por código UNIQUE
     @Override
     public Microchip leerPorCodigo(String codigo) throws Exception {
-        String sql = "SELECT * FROM microchips WHERE codigo = ? AND eliminado = FALSE";
+        String sql = "SELECT * FROM microchip WHERE codigo = ? AND eliminado = FALSE";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -105,7 +104,7 @@ public class MicrochipDaoJdbc implements MicrochipDao {
         m.setEliminado(rs.getBoolean("eliminado"));
         m.setCodigo(rs.getString("codigo"));
         
-        Date sqlDate = rs.getDate("fecha_implantacion");
+        Date sqlDate = rs.getDate("fechaImplantacion");
         if (sqlDate != null) {
             m.setFechaImplantacion(sqlDate.toLocalDate());
         }
@@ -119,7 +118,7 @@ public class MicrochipDaoJdbc implements MicrochipDao {
     // Ejemplo de eliminación lógica transaccional:
     @Override
     public void eliminar(long id, Connection conn) throws Exception {
-        String sql = "UPDATE microchips SET eliminado = TRUE WHERE id = ?";
+        String sql = "UPDATE microchip SET eliminado = TRUE WHERE id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
             ps.executeUpdate();
