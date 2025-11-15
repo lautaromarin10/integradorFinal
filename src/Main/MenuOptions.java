@@ -15,12 +15,12 @@ public class MenuOptions {
         System.out.println("1 - Insertar mascota");
         System.out.println("2 - Actualizar mascota existente");
         System.out.println("3 - Eliminar mascota");
-        System.out.println("4 - Obtener mascota por ID");
+        System.out.println("4 - Buscar mascota por ID");
         System.out.println("5 - Listar todas las mascotas");
         //Opciones de Microchip
         System.out.println("6 - Insertar microchip");
         System.out.println("7 - Eliminar microchip");
-        System.out.println("8 - Obtener microchip por ID");
+        System.out.println("8 - Buscar microchip por ID");
         System.out.println("9 - Listar todos los microchips");
     }
 }
