@@ -9,7 +9,7 @@ public class AppMenu {
         ejecutandose = false;
     }
     
-    public static void run(){
+    public static void run() throws Exception{
         
         while(ejecutandose){
             //Listo las opciones al usuario
