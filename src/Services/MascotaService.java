@@ -2,7 +2,10 @@ package Services;
 import Config.DatabaseConnection;
 import Dao.MascotaDao;
 import Dao.MascotaDaoJdbc;
+import Dao.MicrochipDao;
+import Dao.MicrochipDaoJdbc;
 import Entities.Mascota;
+import Entities.Microchip;
 import java.sql.Connection;
 import java.util.List;
 
@@ -22,6 +25,20 @@ public class MascotaService implements GenericService<Mascota, Long>{
 
             conn.setAutoCommit(false);
             try {
+
+                Microchip microchip = mascota.getMicrochip();
+
+                if(microchip == null){
+                    throw new Exception("La mascota debe tener un Microchip");
+                }
+
+                MicrochipDao microchipDao = new MicrochipDaoJdbc();
+
+                if(microchip.getId() <= 0){
+                    microchipDao.crear(microchip, conn);
+                }
+
+                microchipDao.crear(mascota.getMicrochip(), conn);
                 mascotaDao.crear(mascota, conn);
                 conn.commit();
 

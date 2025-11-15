@@ -36,10 +36,23 @@ public class MascotaDaoJdbc implements MascotaDao {
     
     @Override
     public Mascota crear(Mascota mascota, Connection conn) throws Exception {
-        // La tabla 'mascotas' no tiene la referencia directa a microchip en DB.
-        // La referencia 1-1 se maneja con una FK en la tabla 'microchips'.
-        // Aquí solo insertamos los campos de Mascota.
-        String sql = "INSERT INTO mascota (nombre, especie, raza, fechaNacimiento, duenio, telefonoDuenio, eliminado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+       
+        Microchip microchip = mascota.getMicrochip();
+
+        if(microchip == null){
+            throw new IllegalArgumentException("La mascota debe. tener un Microchip");
+        }
+
+        // Si el microchip no tiene id, lo creamos en la misma transacción
+        if (microchip.getId() == null || microchip.getId() <= 0) {
+            microchipDao.crear(microchip, conn); // microchipDao.crear(Microchip, Connection) debe asignar el id en el objeto
+        }
+
+        if (microchip.getId() == null || microchip.getId() <= 0) {
+            throw new SQLException("No se pudo obtener el ID del Microchip para la Mascota.");
+        }
+
+        String sql = "INSERT INTO mascota (nombre, especie, raza, fechaNacimiento, duenio, telefonoDuenio, eliminado, microchip) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             ps.setString(1, mascota.getNombre());
@@ -49,6 +62,7 @@ public class MascotaDaoJdbc implements MascotaDao {
             ps.setString(5, mascota.getDuenio());
             ps.setString(6, mascota.getTelefonoDuenio());
             ps.setBoolean(7, mascota.estaEliminado());
+            ps.setLong(8, mascota.getMicrochip().getId());
 
             int filasAfectadas = ps.executeUpdate();
             if (filasAfectadas == 0) {

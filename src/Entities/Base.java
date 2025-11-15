@@ -22,7 +22,7 @@ public class Base implements Serializable {
         this.eliminado = false;
     }
 
-    public void setId(Long id){ 
+    public void setId(Long id) {
         this.id = id;
     }
 
