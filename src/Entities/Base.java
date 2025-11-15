@@ -8,11 +8,11 @@ import java.io.Serializable;
 
 public class Base implements Serializable {
 
-    private Long id; 
+    private long id; 
     private boolean eliminado;
 
     // constructor completo
-    public Base(Long id, boolean eliminado){ 
+    public Base(long id, boolean eliminado){ 
         this.id = id;
         this.eliminado = eliminado;
     }
@@ -22,11 +22,11 @@ public class Base implements Serializable {
         this.eliminado = false;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    public Long getId(){ 
+    public long getId(){ 
         return id;
     }
 

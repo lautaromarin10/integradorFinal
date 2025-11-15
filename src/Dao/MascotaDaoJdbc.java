@@ -44,11 +44,11 @@ public class MascotaDaoJdbc implements MascotaDao {
         }
 
         // Si el microchip no tiene id, lo creamos en la misma transacción
-        if (microchip.getId() == null || microchip.getId() <= 0) {
+        if (microchip.getId() <= 0) {
             microchipDao.crear(microchip, conn); // microchipDao.crear(Microchip, Connection) debe asignar el id en el objeto
         }
 
-        if (microchip.getId() == null || microchip.getId() <= 0) {
+        if (microchip.getId() <= 0) {
             throw new SQLException("No se pudo obtener el ID del Microchip para la Mascota.");
         }
 

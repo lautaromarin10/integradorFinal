@@ -71,8 +71,7 @@ public class MascotaService implements GenericService<Mascota, Long>{
         }
     }
     
-    @Override
-    public void eliminar(Long id) throws Exception{
+    public void eliminar(long id) throws Exception{
         
         try(Connection conn = DatabaseConnection.getConnection()){
             conn.setAutoCommit(false);
@@ -97,9 +96,10 @@ public class MascotaService implements GenericService<Mascota, Long>{
         
     }
     
-    public Mascota getById(Long id) throws Exception {
+    @Override
+    public Mascota getById(long id) throws Exception {
         
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try{
             return mascotaDao.leer(id);
         } catch (Exception e) {
             throw new Exception("Error al obtener mascota por ID: " + id, e);
@@ -110,7 +110,7 @@ public class MascotaService implements GenericService<Mascota, Long>{
     public List<Mascota> getAll() throws Exception {
         
             
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try{
             return mascotaDao.leerTodos();
         } catch (Exception e) {
             throw new Exception("Error al obtener las listas de mascotas", e );

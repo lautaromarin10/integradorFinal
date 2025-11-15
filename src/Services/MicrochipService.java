@@ -56,7 +56,7 @@ public void actualizar(Microchip microchip) throws Exception {
     validateMicrochip(microchip); 
 
     // 2. Verificación de ID:
-    if (microchip.getId() == null || (microchip.getId().longValue() <= 0)) {
+    if (microchip.getId() <= 0) {
         throw new IllegalArgumentException("El ID del microchip debe ser > 0 para actualizar");
     }
     
@@ -67,26 +67,25 @@ public void actualizar(Microchip microchip) throws Exception {
     }
 }
 
-    @Override
-public void eliminar(Long id) throws Exception {
-    if (id == null || id <= 0) {
+    public void eliminar(long id) throws Exception {
+    if (id <= 0) {
         throw new IllegalArgumentException("El ID debe ser mayor a 0");
     }
     try {
         // Usa el 'id' recibido y conviértelo a long
-        microchipDao.eliminar(id.longValue()); 
+        microchipDao.eliminar(id); 
     } catch (Exception e) {
         throw new Exception("Error al eliminar Microchip con ID " + id + ": " + e.getMessage(), e);
     }
 }
 
     @Override
-    public Microchip getById(Long id) throws Exception {
-        if (id == null || id <= 0) {
+    public Microchip getById(long id) throws Exception {
+        if (id <= 0) {
             throw new IllegalArgumentException("El ID debe ser mayor a 0");
         }
         try {
-            return microchipDao.leer(id.longValue()); 
+            return microchipDao.leer(id); 
         } catch (Exception e) {
             throw new Exception("Error al obtener Microchip por ID: " + e.getMessage(), e);
         }
