@@ -112,12 +112,75 @@ public class MenuHandle {
     //FUNCIONES DEL PROGRAMA.
 
     //opcion 1
-    public static void insertarMascota(){
+    public static void insertarMascota() throws Exception {
+    System.out.println("\n REGISTRO DE NUEVA MASCOTA ");
+    scanner = new Scanner(System.in);
+
+    // 1. Captura de datos de Mascota
+    System.out.print("Nombre de la mascota: ");
+    String nombre = scanner.nextLine();
+    System.out.print("Especie: ");
+    String especie = scanner.nextLine();
+    System.out.print("Raza: ");
+    String raza = scanner.nextLine();
+    System.out.print("Nombre del Dueño: ");
+    String duenio = scanner.nextLine();
+
+    Mascota nuevaMascota = new Mascota();
+    nuevaMascota.setNombre(nombre);
+    nuevaMascota.setEspecie(especie);
+    nuevaMascota.setRaza(raza);
+    nuevaMascota.setDuenio(duenio);
+
+    // 2. Captura opcional de Microchip
+    System.out.print("¿Desea registrar un Microchip nuevo? (S/N): ");
+    if (scanner.nextLine().trim().toUpperCase().equals("S")) {
+        System.out.println(" DATOS DEL MICROCHIP ");
+        
+        System.out.print("Codigo UNICO del Microchip: ");
+        String codigo = scanner.nextLine();
+        System.out.print("Veterinaria: ");
+        String veterinaria = scanner.nextLine();
+
+        Microchip nuevoChip = new Microchip();
+        nuevoChip.setCodigo(codigo);
+
+        nuevaMascota.setMicrochip(nuevoChip);
+    }
+    
+    // 3. Llamar al Service
+    mascotaService.insertar(nuevaMascota);
+    System.out.println("\n Mascota registrada exitosamente (ID: " + nuevaMascota.getId() + ").");
     }
     
     //opcion 2
-    public static void actualizarMascota(){
-        
+    public static void actualizarMascota() throws Exception {
+    System.out.println("\n ACTUALIZAR MASCOTA ");
+    scanner = new Scanner(System.in);
+    
+    System.out.println("Ingrese ID de la mascota a actualizar:");
+    Long id = Helper.solicitarIDValido();
+    
+    Mascota mascota = mascotaService.getById(id);
+    
+    if (mascota == null) {
+        System.out.println("Mascota con ID " + id + " no encontrada.");
+        return;
+    }
+
+    System.out.println("Mascota actual: " + mascota.getNombre() + " (Dueño: " + mascota.getDuenio() + ")");
+    
+    // Ejemplo de actualización de un campo:
+    System.out.print("Nuevo Nombre (sino dejar vacio): ");
+    String nuevoNombre = scanner.nextLine();
+    if (!nuevoNombre.trim().isEmpty()) {
+        mascota.setNombre(nuevoNombre);
+    }
+    
+    // Si la Mascota tiene un Microchip, le pregunta si se quiere editarlo.
+    
+    mascotaService.actualizar(mascota);
+    System.out.println(" Mascota ID " + id + " actualizada con exito.");
     }
     
     //opcion 3
@@ -182,9 +245,26 @@ public class MenuHandle {
     }
     
     //opcion 6
-    public static void insertarMicrochip(){
-        
-    }
+    public static void insertarMicrochip() throws Exception {
+    System.out.println("\n REGISTRO DE MICROCHIP INDEPENDIENTE ");
+    scanner = new Scanner(System.in);
+    
+    // 1. Captura de datos de Microchip
+    System.out.print("Codigo UNICO del Microchip: ");
+    String codigo = scanner.nextLine();
+    System.out.print("Veterinaria: ");
+    String veterinaria = scanner.nextLine();
+    
+    //Aca no se pide la Mascota ID
+    
+    Microchip nuevoChip = new Microchip();
+    nuevoChip.setCodigo(codigo);
+    nuevoChip.setVeterinaria(veterinaria);
+    
+    // 2. Llamar al Service
+    microchipService.insertar(nuevoChip);
+    System.out.println(" Microchip registrado exitosamente (ID: " + nuevoChip.getId() + ").");
+}
     
     //opcion 7
     public static void eliminarMicrochip() throws Exception{
