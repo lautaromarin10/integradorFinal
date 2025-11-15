@@ -15,7 +15,7 @@ public class MenuHandle {
     private static Scanner scanner;
     private static MascotaService mascotaService = new MascotaService();
     //LAUTY: revisar porque MascotaService se puede utilizar y MicrochipService no
-    //private static MicrochipService microchipService = new MicrochipService();
+    private static MicrochipService microchipService = new MicrochipService();
     
     
     public static int solicitarOpcionValida() {
@@ -98,7 +98,7 @@ public class MenuHandle {
                 MenuHandle.eliminarMascota();
                 break;
             case 8:
-//                MenuHandle.buscarMicrochipPorId();
+                MenuHandle.buscarMicrochipPorId();
                 break;
             case 9:
                 MenuHandle.listarTodasLasMascotas();
@@ -189,34 +189,60 @@ public class MenuHandle {
     //opcion 7
     public static void eliminarMicrochip() throws Exception{
         
+        try{
+            System.out.println("Eliminar microchip por ID");
+            Long id = Helper.solicitarIDValido();
+            
+            microchipService.eliminar(id);
+            System.out.println("Microchip eliminado con exito");
+            
+        } catch (Exception error){
+            System.out.println("Error: El microchip no fue encontrada");
+        }
+        
     }
     
     //opcion 8 - LEER COMENTARIO ARRIBA EN LA LINEA 17 - Si se soluciona esto esta funcion anda.
-//    public static void buscarMicrochipPorId() throws Exception{
-//        
-//        Microchip microchipBuscado = new Microchip();
-//       
-//       try{
-//           Long id = Helper.solicitarIDValido();
-//           System.out.println(id);
-//           microchipBuscado = microchipService.getById(id);
-//           
-//           if(microchipBuscado == null){
-//               System.out.println("No encontramos microchip con el ID: " + id);
-//               return;
-//           }
-//           
-//           System.out.println("Microchip encontrada");
-//           System.out.println(microchipBuscado);
-//           
-//           
-//       } catch (Exception error){
-//           throw new Exception (error);
-//       }
-//    }
+    public static void buscarMicrochipPorId() throws Exception{
+        
+        Microchip microchipBuscado = new Microchip();
+       
+       try{
+           Long id = Helper.solicitarIDValido();
+           System.out.println(id);
+           microchipBuscado = microchipService.getById(id);
+           
+           if(microchipBuscado == null){
+               System.out.println("No encontramos microchip con el ID: " + id);
+               return;
+           }
+           
+           System.out.println("Microchip encontrada");
+           System.out.println(microchipBuscado);
+           
+           
+       } catch (Exception error){
+           throw new Exception (error);
+       }
+    }
     
     //opcion 9
-    public static void listarTodosLosMicrochips(){
+    public static void listarTodosLosMicrochips() throws Exception{
+        
+        
+        List<Microchip> listaMicrochip = new ArrayList<>();
+        
+        try{
+            listaMicrochip = microchipService.getAll();
+            
+            for(Microchip microchip : listaMicrochip){
+                System.out.println(microchip);
+            }
+            
+        } catch (Exception error){
+            throw new Exception(error);
+        }
+        
     }
     
 }
