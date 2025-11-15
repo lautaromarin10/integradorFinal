@@ -4,183 +4,91 @@
  */
 package Services;
 
-import Config.DatabaseConnection;
-import Dao.MicrochipDao;
-import Dao.MicrochipDaoJdbc;
-import Entities.Microchip;
-import java.sql.Connection;
+import Dao.MicrochipDao; // Necesario para acceder al DAO
+import Entities.Microchip; // Necesario para la entidad
+import java.time.LocalDate;
 import java.util.List;
-import java.sql.SQLException;
 
+/**
+ * Implementación del servicio de negocio para la entidad Microchip.
+ * Es la capa de servicio simple, enfocada en la validación de Microchip
+ * y delegación al DAO, sin coordinación transaccional.
+ */
 public class MicrochipService implements GenericService<Microchip, Long> {
+    
+    // Inyección de dependencia
+    private final MicrochipDao microchipDao; 
 
-    // Inicialización del DAO para acceder a la capa de persistencia
-    private final MicrochipDao microchipDao = new MicrochipDaoJdbc();
+    /**
+     * Constructor con inyección de dependencia del DAO.
+     */
+    public MicrochipService(MicrochipDao microchipDao) {
+        if (microchipDao == null) {
+            throw new IllegalArgumentException("MicrochipDAO no puede ser null.");
+        }
+        this.microchipDao = microchipDao;
+    }
 
-    // -------------------------------------------------------------
-    // --- INSERTAR (CREATE)
-    // -------------------------------------------------------------
-
+    // --- MÉTODOS CRUD IMPLEMENTADOS ---
+    
     @Override
     public void insertar(Microchip microchip) throws Exception {
         if (microchip == null) {
-            throw new IllegalArgumentException("El microchip a insertar no puede ser nulo.");
+            throw new IllegalArgumentException("El microchip a insertar no puede ser null.");
         }
+        validateMicrochip(microchip); // RN-M02: Aplicar validaciones
         
-        // 1. Validación de unicidad: El código debe ser único.
-        if (microchipDao.leerPorCodigo(microchip.getCodigo()) != null) {
-            throw new Exception("Error: El código de microchip '" + microchip.getCodigo() + "' ya está registrado.");
-        }
-
-        Connection conn = null;
         try {
-            conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // <--- INICIO DE TRANSACCIÓN
-
-            // Crear el Microchip usando la conexión transaccional
-            microchipDao.crear(microchip, conn);
-            
-            conn.commit(); // Confirmar si todo es exitoso
-
-        } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback(); // Deshacer en caso de error SQL
-            }
-            throw new Exception("Error transaccional al insertar Microchip: " + e.getMessage(), e);
+            microchipDao.crear(microchip); // Llama al DAO simple
         } catch (Exception e) {
-            if (conn != null && !conn.getAutoCommit()) {
-                conn.rollback(); // Deshacer en caso de error de validación o DAO
-            }
-            throw e; // Propagar la excepción (ej: código duplicado)
-        } finally {
-            // Se realiza la lógica de cierre y restauración de la conexión
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException closeE) {
-                    // Manejo de error al cerrar o restaurar
-                    System.err.println("Error al cerrar la conexión: " + closeE.getMessage());
-                }
-            }
+            throw new Exception("Error al insertar Microchip: " + e.getMessage(), e);
         }
     }
-
-    // -------------------------------------------------------------
-    // --- ACTUALIZAR (UPDATE)
-    // -------------------------------------------------------------
 
     @Override
-    public void actualizar(Microchip microchip) throws Exception {
-        if (microchip == null || microchip.getId() == 0) {
-            throw new IllegalArgumentException("Microchip inválido o sin ID para actualizar.");
-        }
-        
-        // 1. Validación de unicidad: Verificar si el código ha cambiado y ya existe en otro registro.
-        Microchip existentePorCodigo = microchipDao.leerPorCodigo(microchip.getCodigo());
-        if (existentePorCodigo != null && existentePorCodigo.getId() != microchip.getId()) {
-            throw new Exception("Error: El código de microchip '" + microchip.getCodigo() + "' ya pertenece a otro registro.");
-        }
-
-        Connection conn = null;
-        try {
-            conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // <--- INICIO DE TRANSACCIÓN
-
-            // Actualizar el Microchip usando la conexión transaccional
-            microchipDao.actualizar(microchip, conn);
-
-            conn.commit(); // Confirmar si todo es exitoso
-
-        } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback(); // Deshacer en caso de error SQL
-            }
-            throw new Exception("Error transaccional al actualizar Microchip: " + e.getMessage(), e);
-        } catch (Exception e) {
-            if (conn != null && !conn.getAutoCommit()) {
-                conn.rollback();
-            }
-            throw e;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException closeE) {
-                    System.err.println("Error al cerrar la conexión: " + closeE.getMessage());
-                }
-            }
-        }
+public void actualizar(Microchip microchip) throws Exception {
+    
+    // 1. Verificación de nulidad del objeto
+    if (microchip == null) {
+        throw new IllegalArgumentException("El microchip a actualizar no puede ser null.");
     }
+    
+    validateMicrochip(microchip); 
 
-    // -------------------------------------------------------------
-    // --- ELIMINAR (DELETE - Lógico)
-    // -------------------------------------------------------------
+    // 2. Verificación de ID:
+    if (microchip.getId() == null || (microchip.getId().longValue() <= 0)) {
+        throw new IllegalArgumentException("El ID del microchip debe ser > 0 para actualizar");
+    }
+    
+    try {
+        microchipDao.actualizar(microchip);
+    } catch (Exception e) {
+        throw new Exception("Error al actualizar Microchip: " + e.getMessage(), e);
+    }
+}
 
     @Override
-    public void eliminar(Long id) throws Exception {
-        if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID inválido para eliminar.");
-        }
-
-        Connection conn = null;
-        try {
-            conn = DatabaseConnection.getConnection();
-            conn.setAutoCommit(false); // <--- INICIO DE TRANSACCIÓN
-
-            // Verificar si el microchip existe antes de intentar eliminar
-            if (microchipDao.leer(id) == null) {
-                 throw new Exception("Microchip con ID " + id + " no encontrado para eliminación.");
-            }
-            
-            // ¡IMPORTANTE! Cuando eliminas un Microchip, la clave foránea con ON DELETE CASCADE 
-            // en la tabla `mascota` DEBERÍA eliminar o poner a NULL la Mascota asociada.
-            // Si la FK en DB es NOT NULL (como la definiste), eliminar el Microchip 
-            // automáticamente **eliminará la Mascota asociada**. 
-            // Si quieres evitar esto, debes quitar la restricción NOT NULL de la FK o
-            // primero desasociar la mascota. Por ahora, nos basamos en tu DDL.
-
-            // Eliminar lógicamente usando la conexión transaccional
-            microchipDao.eliminar(id, conn);
-
-            conn.commit(); // Confirmar si todo es exitoso
-
-        } catch (SQLException e) {
-            if (conn != null) {
-                conn.rollback(); // Deshacer en caso de error SQL
-            }
-            throw new Exception("Error transaccional al eliminar Microchip: " + e.getMessage(), e);
-        } catch (Exception e) {
-            if (conn != null && !conn.getAutoCommit()) {
-                conn.rollback();
-            }
-            throw e;
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException closeE) {
-                    System.err.println("Error al cerrar la conexión: " + closeE.getMessage());
-                }
-            }
-        }
+public void eliminar(Long id) throws Exception {
+    if (id == null || id <= 0) {
+        throw new IllegalArgumentException("El ID debe ser mayor a 0");
     }
-
-    // -------------------------------------------------------------
-    // --- CONSULTAS (READ) - No necesitan transacción
-    // -------------------------------------------------------------
+    try {
+        // Usa el 'id' recibido y conviértelo a long
+        microchipDao.eliminar(id.longValue()); 
+    } catch (Exception e) {
+        throw new Exception("Error al eliminar Microchip con ID " + id + ": " + e.getMessage(), e);
+    }
+}
 
     @Override
     public Microchip getById(Long id) throws Exception {
         if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID inválido para la consulta.");
+            throw new IllegalArgumentException("El ID debe ser mayor a 0");
         }
         try {
-            return microchipDao.leer(id); 
+            return microchipDao.leer(id.longValue()); 
         } catch (Exception e) {
-            throw new Exception("Error al obtener Microchip por ID: " + id, e);
+            throw new Exception("Error al obtener Microchip por ID: " + e.getMessage(), e);
         }
     }
 
@@ -189,7 +97,25 @@ public class MicrochipService implements GenericService<Microchip, Long> {
         try {
             return microchipDao.leerTodos(); 
         } catch (Exception e) {
-            throw new Exception("Error al obtener la lista de Microchips.", e);
+            throw new Exception("Error al obtener la lista de Microchips: " + e.getMessage(), e);
+        }
+    }
+    
+    // --- LÓGICA DE NEGOCIO Y VALIDACIÓN ---
+    
+    private void validateMicrochip(Microchip microchip) {
+        // Nota: La validación de nulidad del objeto 'microchip' se hace ahora en los métodos CRUD.
+        if (microchip.getCodigo() == null || microchip.getCodigo().trim().isEmpty()) {
+            throw new IllegalArgumentException("El código no puede estar vacío ");
+        }
+        if (microchip.getFechaImplantacion() == null) {
+            throw new IllegalArgumentException("La fecha de implantación no puede ser nula ");
+        }
+        if (microchip.getVeterinaria() == null || microchip.getVeterinaria().trim().isEmpty()) {
+            throw new IllegalArgumentException("La veterinaria no puede estar vacía ");
+        }
+        if (microchip.getFechaImplantacion().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de implantación no puede ser futura");
         }
     }
 }
