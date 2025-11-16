@@ -1,9 +1,10 @@
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Services;
-
+import Dao.MicrochipDaoJdbc;
 import Dao.MicrochipDao; // Necesario para acceder al DAO
 import Entities.Microchip; // Necesario para la entidad
 import java.time.LocalDate;
@@ -16,9 +17,14 @@ import java.util.List;
  */
 public class MicrochipService implements GenericService<Microchip, Long> {
     
+    
     // Inyección de dependencia
     private final MicrochipDao microchipDao; 
 
+     // Constructor sin argumentos (asume inicialización interna del DAO)
+    public MicrochipService() { 
+        this.microchipDao = new MicrochipDaoJdbc(); // Debe importarse MicrochipDaoJdbc y MicrochipDao
+    } 
     /**
      * Constructor con inyección de dependencia del DAO.
      */
@@ -28,6 +34,8 @@ public class MicrochipService implements GenericService<Microchip, Long> {
         }
         this.microchipDao = microchipDao;
     }
+    
+
 
     // --- MÉTODOS CRUD IMPLEMENTADOS ---
     
