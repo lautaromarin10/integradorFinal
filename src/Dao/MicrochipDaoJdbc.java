@@ -9,8 +9,8 @@ package Dao;
 import Config.DatabaseConnection;
 import Entities.Microchip;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDate;
 
 // Implementa la interfaz MicrochipDao
 public class MicrochipDaoJdbc implements MicrochipDao {
@@ -105,8 +105,9 @@ public class MicrochipDaoJdbc implements MicrochipDao {
         m.setCodigo(rs.getString("codigo"));
         
         Date sqlDate = rs.getDate("fechaImplantacion");
-        if (sqlDate != null) {
+        if(sqlDate != null){
             m.setFechaImplantacion(sqlDate.toLocalDate());
+
         }
         m.setVeterinaria(rs.getString("veterinaria"));
         m.setObservaciones(rs.getString("observaciones"));
@@ -131,26 +132,62 @@ public class MicrochipDaoJdbc implements MicrochipDao {
 
     @Override
     public Microchip leer(long id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        String sql = "SELECT * FROM microchip where id = ? AND eliminado = FALSE";
+
+        try(Connection conn = DatabaseConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);){
+
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return buildMicrochipFromResultSet(rs);
+                }
+                return null;
+            }
+
+        }
     }
 
     @Override
     public List<Microchip> leerTodos() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+       List<Microchip> lista = new ArrayList<>();
+        String sql = "SELECT * FROM microchip WHERE eliminado = FALSE";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                lista.add(buildMicrochipFromResultSet(rs));
+            }
+            return lista;
+        }
     }
 
     @Override
-    public void actualizar(Microchip entity) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public void actualizar(Microchip microchip) throws Exception {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            actualizar(microchip, conn); // delega en la versión transaccional
+        }
+    }
+
+    @Override
+    public void actualizar(Microchip microchip, Connection conn) throws Exception{
+        String sql = "UPDATE microchip SET fechaImplantacion = ?, veterinaria = ?, observaciones = ? WHERE id = ?";
+        try(PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setDate(1, Date.valueOf(microchip.getFechaImplantacion()));
+            ps.setString(2, microchip.getVeterinaria());
+            ps.setString(3, microchip.getObservaciones());
+            ps.setLong(4, microchip.getId());
+            ps.executeUpdate();
+        }
     }
 
     @Override
     public void eliminar(long id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+         try (Connection conn = DatabaseConnection.getConnection()) {
+            eliminar(id, conn); // delega en la versión transaccional
+        }
+    }
     }
 
-    @Override
-    public void actualizar(Microchip entity, Connection conn) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-}
+ 

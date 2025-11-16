@@ -3,7 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Main;
-import Entities.Mascota;
+import java.time.DateTimeException;
+import java.time.LocalDate;
 import java.util.Scanner;
 /**
  *
@@ -33,6 +34,33 @@ public class Helper {
             
         }
     }
+
+    public static java.sql.Date solicitarFechaValida() {
+
+    while (true) {
+        try {
+            System.out.println("Ingrese año (YYYY):");
+            int anio = Integer.parseInt(scanner.nextLine());
+
+            System.out.println("Ingrese mes (1-12):");
+            int mes = Integer.parseInt(scanner.nextLine());
+
+            System.out.println("Ingrese día (1-31):");
+            int dia = Integer.parseInt(scanner.nextLine());
+
+            // Validar creando LocalDate
+            LocalDate fechaLocal = LocalDate.of(anio, mes, dia);
+
+            // Convertir a java.sql.Date
+            return java.sql.Date.valueOf(fechaLocal);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Debe ingresar números válidos.");
+        } catch (DateTimeException e) {
+            System.out.println("Fecha inválida. Intente nuevamente.");
+        }
+    }
+}
     
     
 }

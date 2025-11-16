@@ -4,8 +4,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Services;
-import Dao.MicrochipDaoJdbc;
-import Dao.MicrochipDao; // Necesario para acceder al DAO
+import Dao.MicrochipDao;
+import Dao.MicrochipDaoJdbc; // Necesario para acceder al DAO
 import Entities.Microchip; // Necesario para la entidad
 import java.time.LocalDate;
 import java.util.List;
@@ -75,6 +75,7 @@ public void actualizar(Microchip microchip) throws Exception {
     }
 }
 
+    @Override
     public void eliminar(long id) throws Exception {
     if (id <= 0) {
         throw new IllegalArgumentException("El ID debe ser mayor a 0");

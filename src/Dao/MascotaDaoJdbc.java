@@ -179,10 +179,9 @@ public class MascotaDaoJdbc implements MascotaDao {
         m.setRaza(rs.getString("raza"));
         
         Date sqlDate = rs.getDate("fechaNacimiento");
-        if (sqlDate != null) {
-            m.setFechaNacimiento(sqlDate.toLocalDate()); // Convertir Date a LocalDate
+        if(sqlDate != null){
+            m.setFechaNacimiento(sqlDate.toLocalDate());
         }
-        
         m.setDuenio(rs.getString("duenio"));
         m.setTelefonoDuenio(rs.getString("telefonoDuenio"));
         

@@ -5,9 +5,9 @@ import Entities.Mascota;
 import Entities.Microchip;
 import Services.MascotaService;
 import Services.MicrochipService;
-import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class MenuHandle {
@@ -77,31 +77,31 @@ public class MenuHandle {
         
         switch(opcionSeleccionada){
             case 1:
-                MenuHandle.insertarMascota();
+                insertarMascota();
                 break;
             case 2:
-                MenuHandle.actualizarMascota();
+                actualizarMascota();
                 break;
             case 3:
-                MenuHandle.eliminarMascota();
+                eliminarMascota();
                 break;
             case 4:
-                MenuHandle.buscarMascotaPorId();
+                buscarMascotaPorId();
                 break;
             case 5:
-                MenuHandle.listarTodasLasMascotas();
+                listarTodasLasMascotas();
                 break;
             case 6:
-                MenuHandle.insertarMascota();
+                insertarMicrochip();
                 break;
             case 7:
-                MenuHandle.eliminarMascota();
+                eliminarMicrochip();
                 break;
             case 8:
-                MenuHandle.buscarMicrochipPorId();
+                buscarMicrochipPorId();
                 break;
             case 9:
-                MenuHandle.listarTodosLosMicrochips();
+                listarTodosLosMicrochips();
                 break;
             default:
                 break;
@@ -113,45 +113,60 @@ public class MenuHandle {
     //FUNCIONES DEL PROGRAMA.
 
     //opcion 1
-    public static void insertarMascota() throws Exception {
-    System.out.println("\n REGISTRO DE NUEVA MASCOTA ");
-    scanner = new Scanner(System.in);
+    public static void insertarMascota() throws Exception{
 
-    // 1. Captura de datos de Mascota
-    System.out.print("Nombre de la mascota: ");
-    String nombre = scanner.nextLine();
-    System.out.print("Especie: ");
-    String especie = scanner.nextLine();
-    System.out.print("Raza: ");
-    String raza = scanner.nextLine();
-    System.out.print("Nombre del Dueño: ");
-    String duenio = scanner.nextLine();
+        System.out.println("REGISTRO DE NUEVA MASCOTA");
 
-    Mascota nuevaMascota = new Mascota();
-    nuevaMascota.setNombre(nombre);
-    nuevaMascota.setEspecie(especie);
-    nuevaMascota.setRaza(raza);
-    nuevaMascota.setDuenio(duenio);
+        //CAPTURA DE DATOS DE MASCOTA
+        System.out.println("Nombre de la mascota: ");
+        String nombre = scanner.nextLine();
+        System.out.println("Especie: ");
+        String especie = scanner.nextLine();
+        System.out.println("Raza: ");
+        String raza = scanner.nextLine();
+        System.out.println("Fecha de nacimiento");
+        java.sql.Date fechaNacimiento = Helper.solicitarFechaValida();
+        System.out.println("Dueño: ");
+        String duenio = scanner.nextLine();
+        System.out.println("Telefono del Dueño");
+        String telefono = scanner.nextLine();
 
-    // 2. Captura opcional de Microchip
-    System.out.print("¿Desea registrar un Microchip nuevo? (S/N): ");
-    if (scanner.nextLine().trim().toUpperCase().equals("S")) {
-        System.out.println(" DATOS DEL MICROCHIP ");
+        Mascota mascota = new Mascota();
+        mascota.setNombre(nombre);
+        mascota.setEspecie(especie);
+        mascota.setRaza(raza);
+        mascota.setFechaNacimiento(fechaNacimiento.toLocalDate());
+        mascota.setDuenio(duenio);
+        mascota.setTelefonoDuenio(telefono);
+
+
+        //CONSTRUIMOS EL MICROCHIP
+
+        System.out.println("REGISTRO DEL MICROCHIP DE " + nombre);
         
-        System.out.print("Codigo UNICO del Microchip: ");
-        String codigo = scanner.nextLine();
-        System.out.print("Veterinaria: ");
+        //CAPTURA DE DATOS DE MICROCHIP
+        System.out.println("Codigo unico del Microchip: ");
+        String codigoUnico = scanner.nextLine();
+        System.out.println("Fecha de implementación: ");
+        java.sql.Date fechaImplementacion = Helper.solicitarFechaValida();
+        System.out.println("Veterinaria: ");
         String veterinaria = scanner.nextLine();
+        System.out.println("Observaciones: ");
+        String observaciones = scanner.nextLine();
 
-        Microchip nuevoChip = new Microchip();
-        nuevoChip.setCodigo(codigo);
 
-        nuevaMascota.setMicrochip(nuevoChip);
-    }
-    
-    // 3. Llamar al Service
-    mascotaService.insertar(nuevaMascota);
-    System.out.println("\n Mascota registrada exitosamente (ID: " + nuevaMascota.getId() + ").");
+        Microchip microchip = new Microchip();
+        microchip.setCodigo(codigoUnico);
+        microchip.setFechaImplantacion(fechaImplementacion.toLocalDate());
+        microchip.setVeterinaria(veterinaria);
+        microchip.setObservaciones(observaciones);
+
+        mascota.setMicrochip(microchip);
+
+        mascotaService.insertar(mascota);
+        System.out.println("Mascota registada exitosamente (ID: " + mascota.getId() + ")");
+
+
     }
     
     //opcion 2
@@ -247,7 +262,7 @@ public class MenuHandle {
     
     //opcion 6
     public static void insertarMicrochip() throws Exception {
-    System.out.println("\n REGISTRO DE MICROCHIP INDEPENDIENTE ");
+    System.out.println("\n REGISTRO DE MICROCHIP ");
     scanner = new Scanner(System.in);
     
     // 1. Captura de datos de Microchip
@@ -255,12 +270,14 @@ public class MenuHandle {
     String codigo = scanner.nextLine();
     System.out.print("Veterinaria: ");
     String veterinaria = scanner.nextLine();
-    
     //Aca no se pide la Mascota ID
+    System.out.print("Fecha de implantación");
+    java.sql.Date fechaImplantacion = Helper.solicitarFechaValida();
     
     Microchip nuevoChip = new Microchip();
     nuevoChip.setCodigo(codigo);
     nuevoChip.setVeterinaria(veterinaria);
+    nuevoChip.setFechaImplantacion(fechaImplantacion.toLocalDate());
     
     // 2. Llamar al Service
     microchipService.insertar(nuevoChip);
