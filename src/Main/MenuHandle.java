@@ -101,7 +101,8 @@ public class MenuHandle {
                 MenuHandle.buscarMicrochipPorId();
                 break;
             case 9:
-                MenuHandle.listarTodasLasMascotas();
+                MenuHandle.listarTodosLosMicrochips();
+                break;
             default:
                 break;
             
