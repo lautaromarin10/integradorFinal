@@ -11,7 +11,7 @@ Este proyecto implementa un sistema de gestión para Mascotas y sus respectivos 
 
 ## Video del proyecto
 
-LINK....
+LINK: https://youtu.be/5xzrih_yGTE
 
 ## Descripción general
 
